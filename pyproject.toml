@@ -2,7 +2,7 @@
 name = "repl-nix-replitbot"
 version = "0.1.0"
 description = "Add your description here"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "flask>=3.1.0",
     "psycopg2-binary>=2.9.10",

@@ -88,7 +88,7 @@ def echo(update: Update, context: CallbackContext) -> None:
 # Hàm main để khởi động bot
 def main():
     # Token bot
-    TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+    TOKEN = "7901367514:AAFfM-Hjk3ULmyd8Ol7TYoem7PAoQ1pobGU"
 
     # Khởi tạo updater
     updater = Updater(TOKEN)
