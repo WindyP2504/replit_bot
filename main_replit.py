@@ -2,7 +2,7 @@ import psycopg2
 from telegram import Update
 from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from flask import Flask
 from threading import Thread
@@ -46,6 +46,7 @@ def echo(update: Update, context: CallbackContext) -> None:
 
     is_sap = 0
     no_off = 0
+    today = datetime.now()
 
     try:
         ensure_user_exists(cursor, user_id, username, first_name, last_name)
@@ -56,14 +57,16 @@ def echo(update: Update, context: CallbackContext) -> None:
                 no_off = int(match.group(1))
             elif "hôm nay" in message_text.lower():
                 no_off = 1
+                today = datetime.now()
+            elif "ngày mai" in message_text.lower():
+                no_off = 1
+                today = datetime.now() + timedelta(days=1)
             elif any(phrase in message_text.lower()
                      for phrase in ["sáng nay", "chiều nay"]):
                 no_off = 0.5
 
             if "sap" in message_text.lower():
                 is_sap = 1
-
-            today = datetime.now()
 
             query = """
             INSERT INTO public."PCN_work_time" ("UserId", "Username", "Year", "Month", "Day", "Date", "No_off", "Is_sap")
@@ -102,20 +105,20 @@ def main():
     updater.idle()
 
 
-# Chạy chương trình
-if __name__ == '__main__':
+# Khởi động Flask server
+app = Flask('')
+
+
+@app.route('/')
+def home():
+    return "Bot đang hoạt động!"
+
+
+def run_server():
+    app.run(host='0.0.0.0', port=8080)
     main()
 
-app_flask = Flask('')
 
-
-@app_flask.route('/')
-def home():
-    return "Bot is alive!"
-
-
-def run():
-    app_flask.run(host='0.0.0.0', port=8080)
-
-
-Thread(target=run).start()
+# Chạy Flask server và bot song song
+if __name__ == '__main__':
+    Thread(target=run_server).start()
