@@ -4,6 +4,8 @@ from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
 import re
 from datetime import datetime
 import os
+from flask import Flask
+from threading import Thread
 
 
 # Hàm kết nối cơ sở dữ liệu
@@ -103,9 +105,6 @@ def main():
 # Chạy chương trình
 if __name__ == '__main__':
     main()
-
-from flask import Flask
-from threading import Thread
 
 app_flask = Flask('')
 
