@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 import os
 
+
 # Hàm kết nối cơ sở dữ liệu
 def connect_db():
     return psycopg2.connect(
@@ -12,12 +13,14 @@ def connect_db():
         user="PCN_human_owner",
         password="x1XE2AFmKTrU",
         host="ep-polished-brook-a121ao7c.ap-southeast-1.aws.neon.tech",
-        port="5432"
-    )
+        port="5432")
+
 
 def ensure_user_exists(cursor, user_id, username, first_name, last_name):
     # Kiểm tra xem UserId đã tồn tại hay chưa
-    cursor.execute("""SELECT COUNT(*) FROM public."PCN_employees" WHERE "UserId" = %s""", (user_id,))
+    cursor.execute(
+        """SELECT COUNT(*) FROM public."PCN_employees" WHERE "UserId" = %s""",
+        (user_id, ))
     if cursor.fetchone()[0] == 0:
         # Nếu chưa tồn tại, thêm mới
         query = """
@@ -25,6 +28,7 @@ def ensure_user_exists(cursor, user_id, username, first_name, last_name):
         VALUES (%s, %s, %s, %s)
         """
         cursor.execute(query, (user_id, username, first_name, last_name))
+
 
 # Hàm xử lý tin nhắn và cập nhật cơ sở dữ liệu
 def echo(update: Update, context: CallbackContext) -> None:
@@ -50,7 +54,8 @@ def echo(update: Update, context: CallbackContext) -> None:
                 no_off = int(match.group(1))
             elif "hôm nay" in message_text.lower():
                 no_off = 1
-            elif any(phrase in message_text.lower() for phrase in ["sáng nay", "chiều nay"]):
+            elif any(phrase in message_text.lower()
+                     for phrase in ["sáng nay", "chiều nay"]):
                 no_off = 0.5
 
             if "sap" in message_text.lower():
@@ -62,10 +67,13 @@ def echo(update: Update, context: CallbackContext) -> None:
             INSERT INTO public."PCN_work_time" ("UserId", "Username", "Year", "Month", "Day", "Date", "No_off", "Is_sap")
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(query, (user_id, username, today.year, today.month, today.day, today, no_off, is_sap))
+            cursor.execute(query, (user_id, username, today.year, today.month,
+                                   today.day, today, no_off, is_sap))
             conn.commit()
 
-            update.message.reply_text(f"BOT đã ghi nhận {no_off} ngày nghỉ {'(SAP)' if is_sap else ''} cho {first_name} {last_name} ({username}).")
+            update.message.reply_text(
+                f"BOT đã ghi nhận {no_off} ngày nghỉ {'(SAP)' if is_sap else ''} cho {first_name} {last_name} ({username})."
+            )
 
     except Exception as e:
         update.message.reply_text(f"Đã xảy ra lỗi: {e}")
@@ -73,6 +81,7 @@ def echo(update: Update, context: CallbackContext) -> None:
     finally:
         cursor.close()
         conn.close()
+
 
 # Hàm main để khởi động bot
 def main():
@@ -83,11 +92,13 @@ def main():
     updater = Updater(TOKEN)
 
     # Thêm handler cho tin nhắn
-    updater.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    updater.dispatcher.add_handler(
+        MessageHandler(Filters.text & ~Filters.command, echo))
 
     # Chạy bot
     updater.start_polling()
     updater.idle()
+
 
 # Chạy chương trình
 if __name__ == '__main__':
@@ -98,12 +109,14 @@ from threading import Thread
 
 app_flask = Flask('')
 
+
 @app_flask.route('/')
 def home():
     return "Bot is alive!"
 
+
 def run():
     app_flask.run(host='0.0.0.0', port=8080)
 
-Thread(target=run).start()
 
+Thread(target=run).start()
